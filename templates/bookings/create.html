@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Бронирование номера{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="/hotel/{{ room.hotel.id }}/">{{ room.hotel.name }}</a></li>
+            <li class="breadcrumb-item active">Бронирование</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-calendar-check"></i> Оформление бронирования</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="alert alert-info">
+                        <h5>{{ room.hotel.name }} - {{ room.room_type }}</h5>
+                        <p>Цена за ночь: <strong class="price">{{ room.price_per_night }} ₽</strong></p>
+                        <p>Максимум гостей: {{ room.capacity }} человек</p>
+                    </div>
+
+                    <form method="post">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="mb-3">
+        <label class="form-label">{{ form.check_in.label }}</label>
+        {{ form.check_in }}
+<script>
+    // Устанавливаем минимальную дату - сегодня
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('id_check_in').min = today;
+    document.getElementById('id_check_out').min = today;
+    
+    // При изменении даты заезда, обновляем минимальную дату выезда
+    document.getElementById('id_check_in').addEventListener('change', function() {
+        const checkIn = this.value;
+        document.getElementById('id_check_out').min = checkIn;
+        if (document.getElementById('id_check_out').value <= checkIn) {
+            document.getElementById('id_check_out').value = '';
+        }
+    });
+</script>
+        {% if form.check_in.errors %}
+            <div class="text-danger small">
+                {% for error in form.check_in.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">{{ form.check_out.label }}</label>
+        {{ form.check_in }}
+<script>
+    // Устанавливаем минимальную дату - сегодня
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('id_check_in').min = today;
+    document.getElementById('id_check_out').min = today;
+    
+    // При изменении даты заезда, обновляем минимальную дату выезда
+    document.getElementById('id_check_in').addEventListener('change', function() {
+        const checkIn = this.value;
+        document.getElementById('id_check_out').min = checkIn;
+        if (document.getElementById('id_check_out').value <= checkIn) {
+            document.getElementById('id_check_out').value = '';
+        }
+    });
+</script>
+        {% if form.check_out.errors %}
+            <div class="text-danger small">
+                {% for error in form.check_out.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">{{ form.guests.label }}</label>
+        {{ form.guests }}
+        {% if form.guests.errors %}
+            <div class="text-danger small">
+                {% for error in form.guests.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <button type="submit" class="btn btn-success w-100">
+        <i class="fas fa-check"></i> Подтвердить бронирование
+    </button>
+</form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5><i class="fas fa-info-circle"></i> Информация</h5>
+                </div>
+                <div class="card-body">
+                    <p>После подтверждения бронирования вы получите:</p>
+                    <ul>
+                        <li>Подтверждение на email</li>
+                        <li>Возможность отменить бронирование</li>
+                        <li>Историю бронирований в личном кабинете</li>
+                    </ul>
+                    <hr>
+                    <h6>Правила отмены:</h6>
+                    <p class="text-muted small">Бесплатная отмена за 24 часа до заезда. Позже — штраф в размере первой ночи.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .price {
+        font-size: 1.3rem;
+        color: #28a745;
+    }
+    input, select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}

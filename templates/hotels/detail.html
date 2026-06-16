@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}{{ hotel.name }} - бронирование{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item active">{{ hotel.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ hotel.name }}</h1>
+            <p class="text-muted">
+                <i class="fas fa-map-marker-alt"></i> {{ hotel.address }}
+            </p>
+            <div class="star-rating mb-3">
+                {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= hotel.stars %}
+                        <i class="fas fa-star text-warning"></i>
+                    {% else %}
+                        <i class="far fa-star text-warning"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="ms-2">
+                    ⭐ {{ hotel.average_rating|floatformat:1 }} ({{ hotel.reviews.count }} отзывов)
+                </span>
+            </div>
+            <p>{{ hotel.description }}</p>
+            
+            {% if hotel.latitude and hotel.longitude %}
+            <h4><i class="fas fa-map"></i> Расположение</h4>
+            <div id="map" style="height: 300px; background: #e9ecef; border-radius: 10px;" class="mb-4">
+                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                    <i class="fas fa-map-marked-alt fa-3x"></i>
+                    <span class="ms-2">Карта: {{ hotel.latitude }}, {{ hotel.longitude }}</span>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- ОТЗЫВЫ -->
+            <div class="mt-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3><i class="fas fa-star"></i> Отзывы ({{ hotel.reviews.count }})</h3>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'add_review' hotel.id %}" class="btn btn-success">
+                            <i class="fas fa-pen"></i> Оставить отзыв
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-sign-in-alt"></i> Войдите, чтобы оставить отзыв
+                        </a>
+                    {% endif %}
+                </div>
+                
+                {% for review in hotel.reviews.all|dictsortreversed:"created_at" %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ review.user.username }}</strong>
+                                <div class="star-rating small">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                        <p class="mt-2 mb-0">{{ review.comment }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> Пока нет отзывов. Будьте первым!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Доступные номера</h5>
+                </div>
+                <div class="card-body">
+                    {% for room in rooms %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <h6>{{ room.room_type }}</h6>
+                        <p class="text-muted small">Максимум гостей: {{ room.capacity }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price">{{ room.price_per_night }} ₽/ночь</span>
+                            <a href="{% url 'create_booking' room.id %}" class="btn btn-sm btn-success">
+                                <i class="fas fa-calendar-check"></i> Забронировать
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Нет доступных номеров</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #28a745;
+    }
+    .star-rating {
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}

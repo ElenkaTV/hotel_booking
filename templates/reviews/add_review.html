@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Добавить отзыв - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="/hotel/{{ hotel.id }}/">{{ hotel.name }}</a></li>
+            <li class="breadcrumb-item active">Добавить отзыв</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-star"></i> 
+                        {% if existing_review %}
+                            Редактировать отзыв
+                        {% else %}
+                            Добавить отзыв
+                        {% endif %}
+                        об отеле {{ hotel.name }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if existing_review %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Вы уже оставляли отзыв. Вы можете отредактировать его ниже.
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.rating.label }}</label>
+                            {{ form.rating }}
+                            <small class="text-muted">1 - ужасно, 5 - превосходно</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.comment.label }}</label>
+                            {{ form.comment }}
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane"></i> 
+                            {% if existing_review %}Сохранить изменения{% else %}Оставить отзыв{% endif %}
+                        </button>
+                        <a href="/hotel/{{ hotel.id }}/" class="btn btn-secondary">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    select, textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    select {
+        width: auto;
+    }
+</style>
+{% endblock %}
