@@ -1,0 +1,1 @@
+"Модели: Hotel, Room, User, Booking, Review" 
